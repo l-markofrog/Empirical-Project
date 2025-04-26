@@ -1,5 +1,4 @@
-from urllib import request, error
-import re
+from urllib import request
 
 starting_page = "https://www.rightmove.co.uk/property-to-rent/find.html?searchLocation=London&useLocationIdentifier=true&locationIdentifier=REGION%5E87490&rent=To+rent&radius=0.0&propertyTypes=flat&_includeLetAgreed=on/"
 url_start = "https://www.rightmove.co.uk"
@@ -14,39 +13,29 @@ def scrape(page, start, end):
         return data_list[0]
     else: return data_list
 
-#output = open("appartments.txt", "w")
-#output.write('Comic, Number, Title\n')
-appartment_links_list_ex = ['https://www.rightmove.co.uk//properties/160619321', 'https://www.rightmove.co.uk//properties/160687214', 'https://www.rightmove.co.uk//properties/160959065', 'https://www.rightmove.co.uk//properties/160617632', 'https://www.rightmove.co.uk//properties/159990269', 'https://www.rightmove.co.uk//properties/161155151', 'https://www.rightmove.co.uk//properties/159978746', 'https://www.rightmove.co.uk//properties/159478985', 'https://www.rightmove.co.uk//properties/160227788', 'https://www.rightmove.co.uk//properties/158884949', 'https://www.rightmove.co.uk//properties/159186707', 'https://www.rightmove.co.uk//properties/161155013', 'https://www.rightmove.co.uk//properties/160394129', 'https://www.rightmove.co.uk//properties/161154677', 'https://www.rightmove.co.uk//properties/161154926', 'https://www.rightmove.co.uk//properties/161154296', 'https://www.rightmove.co.uk//properties/161154434', 'https://www.rightmove.co.uk//properties/161154269', 'https://www.rightmove.co.uk//properties/161154266', 'https://www.rightmove.co.uk//properties/159704990', 'https://www.rightmove.co.uk//properties/157622354', 'https://www.rightmove.co.uk//properties/160587920', 'https://www.rightmove.co.uk//properties/160297301', 'https://www.rightmove.co.uk//properties/161153993', 'https://www.rightmove.co.uk//properties/161153996']
-
-appartment_links_list = []
-
 target = request.urlopen(starting_page)
-find_page = target.read()
+search_page = target.read()
 
+num_pages = int(scrape(search_page, 'of <!-- -->', '</span>'))
 
+output = open("appartments_links.txt", "w")
 
-appartment_links_list = scrape(find_page, '<a data-testid="property-details-lozenge" href="', '#/?')
-appartment_links_list = [url_start + item for item in appartment_links_list]
-
-num_pages = int(scrape(find_page, 'of <!-- -->', '</span>'))
-
-print(appartment_links_list)
-print(len(appartment_links_list))
-print(num_pages)
-
-"""
-for i in range(50):
+for i in range(num_pages):
     try:
-        target = target_start + str(i+1)
-        response = request.urlopen(target)
-        data = response.read()
-        comic_name = data.decode('utf-8').split('<div id="ctitle">')[1].split("</div>")[0]
-        #output.write("xkcd, " + str(i+1)+ ", \"" + comic_name + "\"\n")
+        find_page = f"https://www.rightmove.co.uk/property-to-rent/find.html?searchLocation=London&useLocationIdentifier=true&locationIdentifier=REGION%5E87490&rent=To+rent&radius=0.0&propertyTypes=flat&_includeLetAgreed=on%2F&index={str(i*24)}&sortType=6&channel=RENT&transactionType=LETTING&displayLocationIdentifier=London-87490"
+        target = request.urlopen(find_page)
+        search_page = target.read()
+        appartment_links_list = scrape(search_page, '<a data-testid="property-details-lozenge" href="', '#/?')
+        for item in appartment_links_list:
+            output.write(url_start + item + "\n")
     except:
-        print("Mistake in", i+1)
-"""
+        print(f"Error on link: https://www.rightmove.co.uk/property-to-rent/find.html?searchLocation=London&useLocationIdentifier=true&locationIdentifier=REGION%5E87490&rent=To+rent&radius=0.0&propertyTypes=flat&_includeLetAgreed=on%2F&index={str(i*24)}&sortType=6&channel=RENT&transactionType=LETTING&displayLocationIdentifier=London-87490")
+        
+print("Finished")
 
-# Find properties links:
+
+# HTML paterns found:
+# Find properties' links:
 # <a data-testid="property-details-lozenge" href="  
 # #/?
 
