@@ -23,45 +23,89 @@ print("missing values \n", df_unique.isnull().sum())
 
 ```{python}
 df_region_count = df_unique[["region", "link"]].groupby("region", as_index= False).count()
+df_region_count.columns = ["Region Name", "Count"]
 df_region_count
 ```
 ```{python}
-df_type_count = df_unique[["type", "link"]].groupby("type", as_index= False).count().sort_values(["link"], ascending= False)
-df_type_count
-```
-```{python}
 df_region_mean_price = df_unique[["region", "price_pcm"]].groupby("region", as_index= False).mean().round(2)
+df_region_mean_price.columns = ["Region Name", "Average Price (pcm)"]
 df_region_mean_price
 ```
 ```{python}
+df_type_count = df_unique[["type", "link"]].groupby("type", as_index= False).count().sort_values(["link"], ascending= False).reset_index(drop=True).head(10)
+top_5_types = list(df_type_count.head(5)["type"].values)
+df_type_count.columns = ["Property Type", "Count"]
+df_type_count
+```
+```{python}
+df_type_mean_price = df_unique[["type", "price_pcm"]].groupby("type", as_index= False).mean().round(2).sort_values(["price_pcm"]).reset_index(drop=True)
+df_type_mean_price = df_type_mean_price[df_type_mean_price["type"].isin(top_5_types)].reset_index(drop= True)
+df_type_mean_price.columns = ["Property Type", "Average Price (pcm)"]
+df_type_mean_price
+```
+
+```{python}
 df_bedrooms_count = df_unique[["bedrooms", "link"]].groupby("bedrooms", as_index= False).count().sort_values(["bedrooms"])
+df_bedrooms_count.columns = ["Number of Bedrooms", "Count"]
 df_bedrooms_count
 ```
 ```{python}
 df_bedrooms_mean_price = df_unique[["bedrooms", "price_pcm"]].groupby("bedrooms", as_index= False).mean().round(2).sort_values(["bedrooms"])
+df_bedrooms_mean_price.columns = ["Number of Bedrooms", "Average Price (pcm)"]
 df_bedrooms_mean_price
 ```
 ```{python}
 df_ppb = df_unique.copy()
 df_ppb["price_per_bedroom"] = (df_ppb["price_pcm"]/df_ppb["bedrooms"]).round(2)
 df_ppb = df_ppb[["bedrooms", "price_per_bedroom"]].groupby("bedrooms", as_index= False).mean().round(2).sort_values(["bedrooms"])
+df_ppb.columns = ["Number of Bedrooms", "Average Price per Bedroom (pcm)"]
 df_ppb
 ```
 ```{python}
 df_bathrooms_count = df_unique[["bathrooms", "link"]].groupby("bathrooms", as_index= False).count().sort_values(["bathrooms"])
+df_bathrooms_count.columns = ["Number of Bathrooms", "Count"]
 df_bathrooms_count
 ```
 ```{python}
 df_bathrooms_mean_price = df_unique[["bathrooms", "price_pcm"]].groupby("bathrooms", as_index= False).mean().round(2).sort_values(["bathrooms"])
+df_bathrooms_mean_price.columns = ["Number of Bathrooms", "Average Price (pcm)"]
 df_bathrooms_mean_price
 ```
 ```{python}
 df_ppbt = df_unique.copy()
 df_ppbt["price_per_bathroom"] = (df_ppbt["price_pcm"]/df_ppbt["bathrooms"]).round(2)
 df_ppbt = df_ppbt[["bathrooms", "price_per_bathroom"]].groupby("bathrooms", as_index= False).mean().round(2).sort_values(["bathrooms"])
+df_ppbt.columns = ["Number of Bathrooms", "Average Price per Bathroom (pcm)"]
 df_ppbt
 ```
 ```{python}
+df_unique["price_pcm"].describe()
+```
+```{python}
+df_price_bins = df_unique.copy()
+
+# Create custom width bins (every 250)
+bin_width = 250
+low_price = df_price_bins['price_pcm'].quantile(0.1)
+high_price = df_price_bins['price_pcm'].quantile(0.9)
+min_price = df_price_bins['price_pcm'].min()
+max_price = df_price_bins['price_pcm'].max()
+print("max_price:",max_price)
+print("min_price:",min_price)
+print("high_price (90th percentile):",high_price)
+print("low_price (10th perthentile):",low_price)
+bins = [int(min_price)] + list(range(int(low_price), int(high_price) + bin_width, bin_width)) + [int(max_price)]
+#labels = [f'{bins[i]}-{bins[i+1]+bin_width-1}' for i in range(len(bins))]
+labels = []
+for i in range(len(bins)):
+    if i == len(bins) - 2: labels.append(f"{bins[i]}-{bins[i+1]}")
+    elif i < len(bins) - 2: labels.append(f"{bins[i]}-{bins[i+1]-1}")
+    
 
 
+df_price_bins['price_bin'] = pd.cut(df_price_bins['price_pcm'], bins=bins, labels=labels)
+
+# Group by bins and count
+df_bin_counts = df_price_bins.groupby('price_bin', observed=False).size().reset_index(name='count')
+df_bin_counts
 ```
