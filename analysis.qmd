@@ -79,12 +79,9 @@ df_ppbt.columns = ["Number of Bathrooms", "Average Price per Bathroom (pcm)"]
 df_ppbt
 ```
 ```{python}
-df_unique["price_pcm"].describe()
-```
-```{python}
 df_price_bins = df_unique.copy()
 
-# Create custom width bins (every 250)
+
 bin_width = 250
 low_price = df_price_bins['price_pcm'].quantile(0.1)
 high_price = df_price_bins['price_pcm'].quantile(0.9)
@@ -95,7 +92,6 @@ print("min_price:",min_price)
 print("high_price (90th percentile):",high_price)
 print("low_price (10th perthentile):",low_price)
 bins = [int(min_price)] + list(range(int(low_price), int(high_price) + bin_width, bin_width)) + [int(max_price)]
-#labels = [f'{bins[i]}-{bins[i+1]+bin_width-1}' for i in range(len(bins))]
 labels = []
 for i in range(len(bins)):
     if i == len(bins) - 2: labels.append(f"{bins[i]}-{bins[i+1]}")
@@ -106,6 +102,16 @@ for i in range(len(bins)):
 df_price_bins['price_bin'] = pd.cut(df_price_bins['price_pcm'], bins=bins, labels=labels)
 
 # Group by bins and count
-df_bin_counts = df_price_bins.groupby('price_bin', observed=False).size().reset_index(name='count')
+df_bin_counts = df_price_bins.groupby('price_bin', observed=False).size().reset_index()
+df_bin_counts.columns = ["Price Ranges", "Count"]
 df_bin_counts
+```
+```{python}
+df_crime = pd.read_excel("Crime Rates.xlsx", "Crime Rates")
+df_crime.columns = ["Region Name", "Crime Rate"]
+df_crime
+```
+```{python}
+df_crime_price = pd.merge(df_region_mean_price, df_crime, "inner", "Region Name")
+df_crime_price
 ```
