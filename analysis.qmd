@@ -1,0 +1,67 @@
+```{python}
+import pandas as pd 
+
+df = pd.read_csv('appartments.csv')
+
+df.head()
+```
+
+```{python}
+print("collumns:",df.columns)
+print("shape:",df.shape)
+print("missing values \n",df.isnull().sum())
+```
+
+```{python}
+
+df_unique = df.drop_duplicates(subset=['link'], keep='first')
+print("collumns:",df_unique.columns)
+print("shape:",df_unique.shape)
+print("missing values \n", df_unique.isnull().sum())
+
+```
+
+```{python}
+df_region_count = df_unique[["region", "link"]].groupby("region", as_index= False).count()
+df_region_count
+```
+```{python}
+df_type_count = df_unique[["type", "link"]].groupby("type", as_index= False).count().sort_values(["link"], ascending= False)
+df_type_count
+```
+```{python}
+df_region_mean_price = df_unique[["region", "price_pcm"]].groupby("region", as_index= False).mean().round(2)
+df_region_mean_price
+```
+```{python}
+df_bedrooms_count = df_unique[["bedrooms", "link"]].groupby("bedrooms", as_index= False).count().sort_values(["bedrooms"])
+df_bedrooms_count
+```
+```{python}
+df_bedrooms_mean_price = df_unique[["bedrooms", "price_pcm"]].groupby("bedrooms", as_index= False).mean().round(2).sort_values(["bedrooms"])
+df_bedrooms_mean_price
+```
+```{python}
+df_ppb = df_unique.copy()
+df_ppb["price_per_bedroom"] = (df_ppb["price_pcm"]/df_ppb["bedrooms"]).round(2)
+df_ppb = df_ppb[["bedrooms", "price_per_bedroom"]].groupby("bedrooms", as_index= False).mean().round(2).sort_values(["bedrooms"])
+df_ppb
+```
+```{python}
+df_bathrooms_count = df_unique[["bathrooms", "link"]].groupby("bathrooms", as_index= False).count().sort_values(["bathrooms"])
+df_bathrooms_count
+```
+```{python}
+df_bathrooms_mean_price = df_unique[["bathrooms", "price_pcm"]].groupby("bathrooms", as_index= False).mean().round(2).sort_values(["bathrooms"])
+df_bathrooms_mean_price
+```
+```{python}
+df_ppbt = df_unique.copy()
+df_ppbt["price_per_bathroom"] = (df_ppbt["price_pcm"]/df_ppbt["bathrooms"]).round(2)
+df_ppbt = df_ppbt[["bathrooms", "price_per_bathroom"]].groupby("bathrooms", as_index= False).mean().round(2).sort_values(["bathrooms"])
+df_ppbt
+```
+```{python}
+
+
+```
