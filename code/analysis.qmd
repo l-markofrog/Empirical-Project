@@ -18,7 +18,9 @@ df_region_mean_price
 ```
 ```{python}
 # Create table for most common property types and their number off listings
-df_type_count = df_unique[["type", "link"]].groupby("type", as_index= False).count().sort_values(["link"], ascending= False).reset_index(drop=True).head(6)
+df_type_count = df_unique[["type", "link"]].groupby("type", as_index= False).count()
+df_type_count["link"] = df_type_count["link"] / len(df_unique)
+df_type_count = df_type_count.sort_values(["link"], ascending= False).reset_index(drop=True).head(6)
 # Saving the list of most common property types for future
 top_6_types = list(df_type_count["type"].values)
 df_type_count.columns = ["Property Type", "Count"]
@@ -172,16 +174,19 @@ ax.tick_params(axis = 'y', colors = font_color)
 barh_type_count = ax.barh(df_type_count["Property Type"][::-1], df_type_count["Count"][::-1], color = chart_colors)
 
 # Create title
-title = plt.title('Number of Properties by Type', font = font_type_choice, weight = "bold", color = font_color)
+title = plt.title('Most Common Propery Types', font = font_type_choice, weight = "bold", color = font_color)
 title.set_fontsize(20)
 
 # Set axis labels
-plt.xlabel('Count', fontsize=14, font = font_type_choice, weight = "bold", color = font_color)
+plt.xlabel('Percentage', fontsize=14, font = font_type_choice, weight = "bold", color = font_color)
 plt.ylabel('Property Type', fontsize=14, font = font_type_choice, weight = "bold", color = font_color)
 
 # Set grid
 ax.grid(axis = "x", alpha = 0.3, linestyle = '--', color = font_color)
 ax.set_axisbelow(True)
+
+# Give Percentage look to axis ticks
+ax.xaxis.set_major_formatter('{x:.0%}')
 
 # Save and display
 plt.tight_layout()
