@@ -36,7 +36,7 @@ def scrape(page, start, end):
 
 
 # File of an output. Create writer, for ease of entering data as well as headers for the file.
-csvfile = open('appartments.csv', 'w', newline='')
+csvfile = open('../data/appartments.csv', 'w', newline='')
     
 spamwriter = csv.writer(csvfile, delimiter=',',
                         quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -129,23 +129,8 @@ csvfile.close()
 print("Finished")
 
 
-"""
 
-import pandas as pd
-csvfile = open('test.csv', 'w', newline='')
-    
-spamwriter = csv.writer(csvfile, delimiter=',',
-                        quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
-spamwriter.writerow(['lol', 'kek', 'lmao'])
-spamwriter.writerow(['cool', 'uncool', 'very, very cool'])
-
-csvfile.close()
-
-df = pd.read_csv("test.csv")
-print(df)
-
-"""
 
 #<div class="PropertyInformation_container__2wY0G" data-testid="property-information">
 #</div></div></a>
