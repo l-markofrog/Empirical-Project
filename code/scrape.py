@@ -36,7 +36,7 @@ def scrape(page, start, end):
 
 
 # File of an output. Create writer, for ease of entering data as well as headers for the file.
-csvfile = open('../data/appartments.csv', 'w', newline='')
+csvfile = open('../data/listings.csv', 'w', newline='')
     
 spamwriter = csv.writer(csvfile, delimiter=',',
                         quotechar='"', quoting=csv.QUOTE_MINIMAL)
