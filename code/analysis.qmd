@@ -1,7 +1,7 @@
 ```{python}
 import pandas as pd 
 
-df = pd.read_csv('../data/appartments.csv')
+df = pd.read_csv('data/listings.csv')
 
 df.head()
 ```
@@ -117,7 +117,7 @@ df_bin_counts.columns = ["Price Ranges", "Count"]
 df_bin_counts
 ```
 ```{python}
-df_crime = pd.read_excel("../data/Crime Rates.xlsx", "Crime Rates")
+df_crime = pd.read_excel("data/Crime Rates.xlsx", "Crime Rates")
 df_crime.columns = ["Region Name", "Crime Rate"]
 df_crime
 ```
@@ -175,7 +175,7 @@ ax.xaxis.set_major_formatter('£{x:,.0f}')
 
 # Save and display
 plt.tight_layout()
-plt.savefig('../plots/barh_type_mean_price.png', dpi = dpi_choice, bbox_inches = 'tight')
+plt.savefig('plots/barh_type_mean_price.png', dpi = dpi_choice, bbox_inches = 'tight')
 plt.show()
 ```
 ```{python}
@@ -214,7 +214,7 @@ ax.set_axisbelow(True)
 
 # Save and display
 plt.tight_layout()
-plt.savefig('../plots/barh_type_count.png', dpi = dpi_choice, bbox_inches = 'tight')
+plt.savefig('plots/barh_type_count.png', dpi = dpi_choice, bbox_inches = 'tight')
 plt.show()
 ```
 ```{python}
@@ -253,7 +253,7 @@ ax.yaxis.set_major_formatter('£{x:,.0f}')
 
 # Save and display
 plt.tight_layout()
-plt.savefig('../plots/bar_region_mean_price.png', dpi = dpi_choice, bbox_inches = 'tight')
+plt.savefig('plots/bar_region_mean_price.png', dpi = dpi_choice, bbox_inches = 'tight')
 plt.show()
 ```
 ```{python}
@@ -292,7 +292,7 @@ plt.xticks(rotation = 45, ha = 'right')
 
 # Save and display
 plt.tight_layout()
-plt.savefig('../plots/hist_price_bins.png', dpi = dpi_choice, bbox_inches = 'tight')
+plt.savefig('plots/hist_price_bins.png', dpi = dpi_choice, bbox_inches = 'tight')
 plt.show()
 ```
 ```{python}
@@ -352,7 +352,7 @@ ax.xaxis.set_major_formatter('£{x:,.0f}')
 
 # Save and display
 plt.tight_layout()
-plt.savefig('../plots/scatt_crime_price.png', dpi = dpi_choice, bbox_inches = 'tight')
+plt.savefig('plots/scatt_crime_price.png', dpi = dpi_choice, bbox_inches = 'tight')
 plt.show()
 ```
 ```{python}
@@ -415,6 +415,6 @@ ax.xaxis.set_major_formatter('£{x:,.0f}')
 
 # Save and display
 plt.tight_layout()
-plt.savefig('../plots/barh_bedrooms_combined.png', dpi = dpi_choice, bbox_inches = 'tight')
+plt.savefig('plots/barh_bedrooms_combined.png', dpi = dpi_choice, bbox_inches = 'tight')
 plt.show()
 ```
