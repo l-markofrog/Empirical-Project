@@ -1,60 +1,44 @@
 ```{python}
 import pandas as pd 
 
+# Reading listings data
 df = pd.read_csv('data/listings.csv')
 
 df.head()
 ```
-
 ```{python}
-print("collumns:",df.columns)
-print("shape:",df.shape)
-print("missing values \n",df.isnull().sum())
-```
-
-```{python}
-
+# Remove duplicate properties
 df_unique = df.drop_duplicates(subset=['link'], keep='first')
-print("collumns:",df_unique.columns)
-print("shape:",df_unique.shape)
-print("missing values \n", df_unique.isnull().sum())
-
-```
-
-```{python}
-df_region_count = df_unique[["region", "link"]].groupby("region", as_index= False).count()
-df_region_count.columns = ["Region Name", "Count"]
-df_region_count
 ```
 ```{python}
+# Create table for average prices by region
 df_region_mean_price = df_unique[["region", "price_pcm"]].groupby("region", as_index= False).mean().round(2)
 df_region_mean_price.columns = ["Region Name", "Average Price (pcm)"]
 df_region_mean_price
 ```
 ```{python}
+# Create table for most common property types and their number off listings
 df_type_count = df_unique[["type", "link"]].groupby("type", as_index= False).count().sort_values(["link"], ascending= False).reset_index(drop=True).head(6)
+# Saving the list of most common property types for future
 top_6_types = list(df_type_count["type"].values)
 df_type_count.columns = ["Property Type", "Count"]
 df_type_count
 ```
 ```{python}
+# Create table for average prices of mosto common property types
 df_type_mean_price = df_unique[["type", "price_pcm"]].groupby("type", as_index= False).mean().round(2).sort_values(["price_pcm"]).reset_index(drop=True)
 df_type_mean_price = df_type_mean_price[df_type_mean_price["type"].isin(top_6_types)].reset_index(drop= True)
 df_type_mean_price.columns = ["Property Type", "Average Price (pcm)"]
 df_type_mean_price
 ```
-
 ```{python}
-df_bedrooms_count = df_unique[["bedrooms", "link"]].groupby("bedrooms", as_index= False).count().sort_values(["bedrooms"])
-df_bedrooms_count.columns = ["Number of Bedrooms", "Count"]
-df_bedrooms_count
-```
-```{python}
+# Create table of average prices per number of beds
 df_bedrooms_mean_price = df_unique[["bedrooms", "price_pcm"]].groupby("bedrooms", as_index= False).mean().round(2).sort_values(["bedrooms"])
 df_bedrooms_mean_price.columns = ["Number of Bedrooms", "Average Price (pcm)"]
 df_bedrooms_mean_price
 ```
 ```{python}
+# Create table for number of prices per number of beds by number of beds
 df_ppb = df_unique.copy()
 df_ppb["price_per_bedroom"] = (df_ppb["price_pcm"]/df_ppb["bedrooms"]).round(2)
 df_ppb = df_ppb[["bedrooms", "price_per_bedroom"]].groupby("bedrooms", as_index= False).mean().round(2).sort_values(["bedrooms"])
@@ -62,6 +46,7 @@ df_ppb.columns = ["Number of Bedrooms", "Average Price per Bedroom (pcm)"]
 df_ppb
 ```
 ```{python}
+# Combine last two tables
 df_bedrooms_combined = pd.merge(df_bedrooms_mean_price, df_ppb, "inner", on = ["Number of Bedrooms"])
 df_studio = df_type_mean_price[df_type_mean_price["Property Type"] == "Studio"]
 df_studio.columns = ["Number of Bedrooms", "Average Price (pcm)"]
@@ -72,42 +57,26 @@ df_bedrooms_combined = pd.concat([df_studio, df_bedrooms_combined], axis = 0).re
 df_bedrooms_combined
 ```
 ```{python}
-df_bathrooms_count = df_unique[["bathrooms", "link"]].groupby("bathrooms", as_index= False).count().sort_values(["bathrooms"])
-df_bathrooms_count.columns = ["Number of Bathrooms", "Count"]
-df_bathrooms_count
-```
-```{python}
-df_bathrooms_mean_price = df_unique[["bathrooms", "price_pcm"]].groupby("bathrooms", as_index= False).mean().round(2).sort_values(["bathrooms"])
-df_bathrooms_mean_price.columns = ["Number of Bathrooms", "Average Price (pcm)"]
-df_bathrooms_mean_price
-```
-```{python}
-df_ppbt = df_unique.copy()
-df_ppbt["price_per_bathroom"] = (df_ppbt["price_pcm"]/df_ppbt["bathrooms"]).round(2)
-df_ppbt = df_ppbt[["bathrooms", "price_per_bathroom"]].groupby("bathrooms", as_index= False).mean().round(2).sort_values(["bathrooms"])
-df_ppbt.columns = ["Number of Bathrooms", "Average Price per Bathroom (pcm)"]
-df_ppbt
-```
-```{python}
+# Create table for number of properties with prices in certain range
 df_price_bins = df_unique.copy()
 
-
+# Setting some values for bins sizes
 bin_width = 250
+# Used percentiles to combine some outliers so the plot does noot look too long
 low_price = df_price_bins['price_pcm'].quantile(0.1)
 high_price = df_price_bins['price_pcm'].quantile(0.9)
 min_price = df_price_bins['price_pcm'].min()
 max_price = df_price_bins['price_pcm'].max()
-print("max_price:",max_price)
-print("min_price:",min_price)
-print("high_price (90th percentile):",high_price)
-print("low_price (10th perthentile):",low_price)
+
+# Created bins
 bins = [int(min_price)] + list(range(int(low_price), int(high_price) + bin_width, bin_width)) + [int(max_price)]
+
+# Created bin labels
 labels = []
 for i in range(len(bins)):
     if i == len(bins) - 2: labels.append(f"£{bins[i]:,}-£{bins[i+1]:,}")
     elif i < len(bins) - 2: labels.append(f"£{bins[i]:,}-£{bins[i+1]-1:,}")
     
-
 
 df_price_bins['price_bin'] = pd.cut(df_price_bins['price_pcm'], bins=bins, labels=labels)
 
@@ -117,11 +86,13 @@ df_bin_counts.columns = ["Price Ranges", "Count"]
 df_bin_counts
 ```
 ```{python}
+# Import crime data table
 df_crime = pd.read_excel("data/Crime Rates.xlsx", "Crime Rates")
 df_crime.columns = ["Region Name", "Crime Rate"]
 df_crime
 ```
 ```{python}
+# Combine crime rate table with average prices table
 df_crime_price = pd.merge(df_region_mean_price, df_crime, "inner", "Region Name")
 df_crime_price
 ```
@@ -377,6 +348,7 @@ y_pos = range(len(df_bedrooms_combined))
 ax.barh(y_pos, df_bedrooms_combined["Average Price (pcm)"], color = "#4f2c30", label = "Average Price (pcm)")
 ax.barh(y_pos, df_bedrooms_combined["Average Price per Bedroom (pcm)"], color = chart_colors[5], label = "Average Price per Bedroom (pcm)")
 
+# Set yaxis labels
 ax.set_yticks(y_pos)
 ax.set_yticklabels(df_bedrooms_combined["Number of Bedrooms"])
 

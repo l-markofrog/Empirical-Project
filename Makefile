@@ -1,5 +1,9 @@
 # Makefile
 
+# Code files
+SCRAPE_PY = code/scrape.py
+ANALYSIS_QMD = code/analysis.qmd
+
 # Files created by code
 DATA_FILE = data/listings.csv
 
@@ -14,21 +18,17 @@ PLOT_FILES = \
 # ----- Tasks -----
 
 # run: create missing files
-run:
-	@if [ ! -f $(DATA_FILE) ]; then \
-		echo "Running scrape.py to create listings.csv..."; \
-		python3 code/scrape.py; \
-	else \
-		echo "listings.csv already exists."; \
-	fi
-	@if [ ! -f plots/bar_region_mean_price.png ] || [ ! -f plots/barh_bedrooms_combined.png ] || [ ! -f plots/barh_type_count.png ] || [ ! -f plots/barh_type_mean_price.png ] || [ ! -f plots/hist_price_bins.png ] || [ ! -f plots/scatt_crime_price.png ]; then \
-		echo "Running analysis.qmd to generate plots..."; \
-		quarto render code/analysis.qmd --execute-dir="$(PWD)"; \
-		rm -f code/analysis.html; \
-		rm -rf code/analysis_files; \
-	else \
-		echo "All plots already exist."; \
-	fi
+run: $(DATA_FILE) $(PLOT_FILES) ## Run code to generate missing files
+
+$(DATA_FILE): $(SCRAPE_PY)  ## Generate listings.csv if scrape.py is modified
+	@echo "Running scrape.py to create listings.csv..."
+	python3 $(SCRAPE_PY)
+
+$(PLOT_FILES): $(ANALYSIS_QMD) $(DATA_FILE)  ## Generate plots if analysis.qmd or listings.csv is modified
+	@echo "Running analysis.qmd to generate plots..."
+	quarto render $(ANALYSIS_QMD) --execute-dir="$(PWD)"
+	rm -f code/analysis.html; \
+	rm -rf code/analysis_files; \
 
 # clean: delete generated files
 clean:
