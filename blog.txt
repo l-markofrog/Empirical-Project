@@ -1,2 +1,2 @@
-blog link: 
+blog link: https://hackmd.io/@nqvQY40QRR-ygYkx8c3gIg/B1bB_Xhyel
 github link: https://github.com/l-markofrog/Empirical-Project.git
